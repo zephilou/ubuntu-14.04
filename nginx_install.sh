@@ -249,7 +249,6 @@ server {
       fastcgi_cache microcache;
       fastcgi_cache_key $scheme$host$request_uri$request_method;
       fastcgi_cache_valid any 8m;
-      fastcgi_cache_use_stale updating;
       fastcgi_cache_bypass $http_pragma;
       fastcgi_cache_use_stale updating error timeout invalid_header http_500;
 
