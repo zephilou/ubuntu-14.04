@@ -9,6 +9,11 @@ apt-get -f upgrade
 
 #install requierements
 apt-get install -f build-essential zlib1g-dev libpcre3 libpcre3-dev unzip make libssl-dev
+
+#12.04 dep
+#apt-get install -f libc6 libexpat1 libgd2-xpm libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.14 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
+
+#14.04 
 apt-get install -f libc6 libexpat1  libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.18 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
 
 #create user
@@ -268,6 +273,15 @@ EOF
 
 #install php5
 
+#12.04
+#apt-get install php5 php5-fpm  php5-curl php5-mcrypt php5-gd php5-common php5-mysql
+#Socket version
+#vim /etc/php5/fpm/pool.d/www.conf
+#;listen = 127.0.0.1:9000
+#listen = /var/run/php5-fpm.sock
+#/etc/init.d/php5-fpm restart
+
+#14.04
 apt-get install php5 php5-fpm php5-apcu php5-curl php5-mcrypt php5-gd php5-json php5-mysql
 
 #End 
