@@ -2,19 +2,22 @@
 # Inspired by http://www.jeffmould.com/2013/11/26/install-nginx-source-ubuntu-12-04/
 # Adapted for Ubuntu 14.04
 
+echo "$(tput bold ; tput setaf 6)############################################################"
+echo "###	$(tput bold ; tput setaf 2) Cyklodev secure layer Ubuntu 14.04  $(tput bold ; tput setaf 6)		####"
+echo "$(tput bold ; tput setaf 6)############################################################$(tput sgr0)"
 
 # update system
 apt-get update
-apt-get -f upgrade 
+apt-get -y upgrade 
 
 #install requierements
-apt-get install -f build-essential zlib1g-dev libpcre3 libpcre3-dev unzip make libssl-dev
+apt-get install -y build-essential zlib1g-dev libpcre3 libpcre3-dev unzip make libssl-dev
 
 #12.04 dep
 #apt-get install -f libc6 libexpat1 libgd2-xpm libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.14 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
 
 #14.04 
-apt-get install -f libc6 libexpat1  libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.18 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
+apt-get install -y libc6 libexpat1  libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.18 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
 
 #create user
 adduser --system --no-create-home --disabled-login --disabled-password --group www-data
@@ -271,6 +274,8 @@ cat <<'EOF' > /usr/share/nginx/html/info.php
 <?php phpinfo();?>
 EOF
 
+update-rc.d nginx defaults
+
 #install php5
 
 #12.04
@@ -282,7 +287,7 @@ EOF
 #/etc/init.d/php5-fpm restart
 
 #14.04
-apt-get install php5 php5-fpm php5-apcu php5-curl php5-mcrypt php5-gd php5-json php5-mysql
+apt-get install -y php5 php5-fpm php5-apcu php5-curl php5-mcrypt php5-gd php5-json php5-mysql
 
 #End 
 echo "Enable default vhost mytest14 with : ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/"
