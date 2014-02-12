@@ -56,7 +56,7 @@ echo "$(tput setaf 1)Email output settings$(tput sgr0)"
 
 apt-get install -y ssmtp mailutils
 
-cat <<'EOF' > /etc/ssmtp/ssmtp.conf.my
+cat <<"EOF" > /etc/ssmtp/ssmtp.conf.my
 mailhub=mail
 hostname=$SMTP_DOMAIN
 FromLineOverride=YES
