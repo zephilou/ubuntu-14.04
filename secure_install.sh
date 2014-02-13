@@ -71,7 +71,7 @@ cp /etc/ssmtp/ssmtp.conf.my /etc/ssmtp/ssmtp.conf
 
 echo "$(tput setaf 1)Config UFW$(tput sgr0)"
 
-ufw allow 22
+ufw allow $SSH_PORT
 ufw enable
 ufw default deny
 
@@ -110,6 +110,7 @@ tar xvfvz maldetect-current.tar.gz
 rm -v 
 cd maldetect-*
 ./install.sh
+cd ..
 rm -rfv maldetect-*
 
 maldet -u
