@@ -3,7 +3,7 @@
 # Adapted for Ubuntu 14.04
 
 echo "$(tput bold ; tput setaf 6)############################################################"
-echo "###	$(tput bold ; tput setaf 2) Cyklodev secure layer Ubuntu 14.04  $(tput bold ; tput setaf 6)		####"
+echo "###	$(tput bold ; tput setaf 2) Cyklodev Nginx/Php on Ubuntu 14.04  $(tput bold ; tput setaf 6)		####"
 echo "$(tput bold ; tput setaf 6)############################################################$(tput sgr0)"
 
 # update system
@@ -14,7 +14,7 @@ apt-get -y upgrade
 apt-get install -y build-essential zlib1g-dev libpcre3 libpcre3-dev unzip make libssl-dev
 
 #12.04 dep
-#apt-get install -f libc6 libexpat1 libgd2-xpm libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.14 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
+#apt-get install -y libc6 libexpat1 libgd2-xpm libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.14 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
 
 #14.04 
 apt-get install -y libc6 libexpat1  libgd2-xpm-dev libgeoip1 libgeoip-dev libpam0g libssl1.0.0 libxml2 libxslt1.1  zlib1g libperl5.18 perl  openssl  libgd2-xpm-dev libgeoip-dev  libxslt1-dev
@@ -278,17 +278,53 @@ update-rc.d nginx defaults
 
 #install php5
 
-#12.04
-#apt-get install php5 php5-fpm  php5-curl php5-mcrypt php5-gd php5-common php5-mysql
-#Socket version
-#vim /etc/php5/fpm/pool.d/www.conf
-#;listen = 127.0.0.1:9000
-#listen = /var/run/php5-fpm.sock
-#/etc/init.d/php5-fpm restart
+#requirements
+apt-get update
+apt-get install -y autoconf2.13 libssl-dev libcurl4-gnutls-dev libjpeg62-dev libpng12-dev  libmysql++-dev libfreetype6-dev libt1-dev libc-client-dev mysql-client libevent-dev libxml2-dev libtool libmcrypt-dev
 
-#14.04
-apt-get install -y php5 php5-fpm php5-apcu php5-curl php5-mcrypt php5-gd php5-json php5-mysql
+# get sources 
+wget http://fr2.php.net/get/php-5.5.9.tar.gz/from/this/mirror -O php-src.tar.gz
+mkdir /opt/php5-src
+tar -C /opt/php5-src -xvzf php-src.tar.gz
+rm -v php-src.tar.gz
+cd /opt/php5-src/php-5.*
 
+./configure --enable-fpm --with-mcrypt --enable-mbstring --with-openssl --with-mysql --with-mysql-sock --with-gd --with-jpeg-dir=/usr/lib --enable-gd-native-ttf  --with-pdo-mysql --with-libxml-dir=/usr/lib --with-mysqli=/usr/bin/mysql_config --with-curl --enable-zip  --enable-sockets --with-zlib --enable-exif --enable-ftp --with-iconv --with-gettext --enable-gd-native-ttf --with-t1lib=/usr --with-freetype-dir=/usr --prefix=/usr/local/php --with-fpm-user=www-data --with-fpm-group=www-data
+make
+make install
+
+# Create directory and default pool
+mkdir -p /etc/php/pool.d/
+
+cat <<'EOF' > /etc/php/pool.d/www.conf
+[www]
+user = www-data
+group = www-data
+listen = /var/run/php5-fpm.sock
+ 
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+chdir = /
+EOF
+
+# create init script
+cp  sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+chmod 750 /etc/init.d/php-fpm
+
+# Conf file access 
+cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+ln -s /usr/local/php/etc/php-fpm.conf /etc/php/
+
+#Post config 
+sed -i 's/;include=etc\/fpm.d\/\*.conf/include=\/etc\/php\/pool.d\/\*.conf/g' /usr/local/php/etc/php-fpm.conf
+#    ;include=etc/fpm.d/*.conf     ;include=\/etc\/php\/pool.d\/\*.conf
+sed -i 's/;error_log = log\/php-fpm.log/error_log=\/var\/log\/php-fpm.log/g' /usr/local/php/etc/php-fpm.conf
+#     ;error_log = log/php-fpm.log   error_log=/var/log/php-fpm.log
+sed -i 's/listen = 127.0.0.1:9000/listen = \/var\/run\/php5-fpm.sock/g' /usr/local/php/etc/php-fpm.conf
+#		listen = 127.0.0.1:9000 	listen = /var/run/php5-fpm.sock
 #End 
 echo "Enable default vhost mytest14 with : ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/"
 echo "Tweack your hosts file with mytest14 and according IP"
